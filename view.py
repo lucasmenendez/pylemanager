@@ -154,7 +154,7 @@ class View(tk.Frame):
             path = self.current_dir + "/" + basename
 
             if self.controller.delete(path):
-                self.statusbar_content.set("'"+basename+"' folder deleted succesfully.")
+                self.statusbar_content.set("'"+basename+"' deleted succesfully.")
                 self.reloadMainList()
             else:
                 self.statusbar_content.set("Error deleting '"+basename+"' folder.")

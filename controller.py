@@ -18,7 +18,6 @@ class Controller():
                     else:
                         if not self.delete(item):
                             return False
-                        os.rmdir(item)
                 os.rmdir(path)    
             else:
                 os.unlink(path)
