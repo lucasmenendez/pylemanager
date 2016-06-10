@@ -2,8 +2,34 @@ import sys, os
 
 class Controller():
 
-    def copy(self):
-        return
+    def copyFile(self, file, location):
+        parts   = file.split("/")
+        index   = len(parts)-1
+        dest    = open(location + "/" + parts[index], "w+")
+        
+        if os.path.exists(file) and os.path.isfile(file):
+
+            buffer = None
+            with open(file, "r") as content:
+                buffer = content.read()
+
+            dest.write(buffer)
+            return True
+        return False
+
+    def copy(self, selection, location):
+        if os.path.exists(location):
+            if not type(selection) is type(()):
+                selection = tuple(selection)
+
+            if len(selection) > 0:    
+                for item in selection:
+                    if os.path.exists(item):
+                        if os.path.isfile(item):
+                            if not self.copyFile(item, location):
+                                return False
+                return True
+        return False
  
     def cut(self):
         return
@@ -14,13 +40,22 @@ class Controller():
                 for (i, basename) in enumerate(os.listdir(path)):
                     item = path + "/" + basename
                     if os.path.isfile(item):
-                        os.unlink(item)
+                        try:
+                            os.unlink(item)
+                        except:
+                            return False
                     else:
                         if not self.delete(item):
                             return False
-                os.rmdir(path)    
+                try:
+                     os.rmdir(path)    
+                except:
+                    return False
             else:
-                os.unlink(path)
+                try:
+                    os.unlink(path)
+                except:
+                    return False
             
             return True    
         return False

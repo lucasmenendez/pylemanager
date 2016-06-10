@@ -32,19 +32,19 @@ class View(tk.Frame):
 
     def createToolbar(self):
         self.buttons["copy"] = tk.Button(self, text="Copy", command=lambda: self.registerAction("copy"))
-        self.buttons["copy"].grid(row=0, column=0);
+        self.buttons["copy"].grid(row=0, column=0)
         self.buttons["cut"] = tk.Button(self, text="Cut", command=lambda: self.registerAction("cut"))
-        self.buttons["cut"].grid(row=0, column=1);
+        self.buttons["cut"].grid(row=0, column=1)
         self.buttons["paste"] = tk.Button(self, text="Paste", command=self.execAction)
-        self.buttons["paste"].grid(row=0, column=2);
+        self.buttons["paste"].grid(row=0, column=2)
         self.buttons["new_file"] = tk.Button(self, text="New file")
-        self.buttons["new_file"].grid(row=0, column=3);
+        self.buttons["new_file"].grid(row=0, column=3)
         self.buttons["delete"] = tk.Button(self, text="Delete", command=self.deleteFolder)
-        self.buttons["delete"].grid(row=0, column=4);
+        self.buttons["delete"].grid(row=0, column=4)
         self.buttons["new_folder"] = tk.Button(self, text="New folder", command=self.newFolderDialog)
-        self.buttons["new_folder"].grid(row=0, column=5);
+        self.buttons["new_folder"].grid(row=0, column=5)
         self.buttons["reload"] = tk.Button(self, text="Reload", command=self.reloadMainList)
-        self.buttons["reload"].grid(row=0, column=6);
+        self.buttons["reload"].grid(row=0, column=6)
  
     def createMainList(self):
         if self.main_list is None:
@@ -76,12 +76,15 @@ class View(tk.Frame):
             self.shf.set(0)
         
         items = self.controller.loadFolder(self.current_dir, self.shf.get())
+        items.sort()
 
         self.main_list.delete(0, tk.END)
         if self.current_dir != "/": 
             index = 1
             self.main_list.insert(0, "../")
-
+        else:
+            self.current_dir = ""
+        
         for item in items:
             self.main_list.insert(index, item)
             index += 1
@@ -134,9 +137,13 @@ class View(tk.Frame):
         self.main_list.selection_clear(0, tk.END)
      
     def execAction(self):
-        self.statusbar_content.set("")
-        print self.items_selected
-        print self.action
+        action = getattr(self.controller, self.action)
+        
+        if action(self.items_selected, self.current_dir):
+            self.statusbar_content.set("Done! :)")
+            self.reloadMainList()
+        else:
+            self.statusbar_content.set("An error occurred :(")
 
     def submitNewFolder(self, folder_name):
         folder = self.current_dir + "/" + folder_name
@@ -157,4 +164,4 @@ class View(tk.Frame):
                 self.statusbar_content.set("'"+basename+"' deleted succesfully.")
                 self.reloadMainList()
             else:
-                self.statusbar_content.set("Error deleting '"+basename+"' folder.")
+                self.statusbar_content.set("Error deleting '"+basename+"'.")
