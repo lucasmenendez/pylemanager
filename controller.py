@@ -22,11 +22,15 @@ class Controller():
                     if os.path.exists(item):
                         if os.path.isdir(item):
                             dest = location+"/"+self.basename(item)
-                            os.mkdir(dest, 0755)                           
- 
+                            try:
+                                os.mkdir(dest, 0755)                           
+                            except:
+                                return False
+
                             new_selection = []
                             for basename in os.listdir(item):
                                 new_selection.append(item+"/"+basename)
+
                             if not self.copy(new_selection, dest):
                                 return True
                         else:
