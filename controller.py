@@ -3,9 +3,7 @@ import sys, os
 class Controller():
 
     def copyFile(self, file, location):
-        parts   = file.split("/")
-        index   = len(parts)-1
-        dest    = open(location + "/" + parts[index], "w+")
+        dest = open(location+"/"+self.basename(file), "w+")
         
         if os.path.exists(file) and os.path.isfile(file):
 
@@ -19,13 +17,19 @@ class Controller():
 
     def copy(self, selection, location):
         if os.path.exists(location):
-            if not type(selection) is type(()):
-                selection = tuple(selection)
-
             if len(selection) > 0:    
                 for item in selection:
                     if os.path.exists(item):
-                        if os.path.isfile(item):
+                        if os.path.isdir(item):
+                            dest = location+"/"+self.basename(item)
+                            os.mkdir(dest, 0755)                           
+ 
+                            new_selection = []
+                            for basename in os.listdir(item):
+                                new_selection.append(item+"/"+basename)
+                            if not self.copy(new_selection, dest):
+                                return True
+                        else:
                             if not self.copyFile(item, location):
                                 return False
                 return True
@@ -77,3 +81,8 @@ class Controller():
             items.append(item)
 
         return items
+
+    def basename(self, item):
+        parts = item.split("/")
+        index = len(parts)-1
+        return parts[index]

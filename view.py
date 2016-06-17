@@ -16,13 +16,15 @@ class View(tk.Frame):
     buttons             = {}
 
     def __init__(self, master = None):
-        self.controller = controller.Controller()
-        self.current_dir = path.expanduser(self.current_dir)
+        self.controller     = controller.Controller()
+        self.current_dir    = path.expanduser(self.current_dir)
+
+        if master is None:
+            master = tk.Tk()
+            master.geometry("300x200")
 
         tk.Frame.__init__(self, master)
-        self.grid(sticky="nsew")
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=1)
+        self.pack(fill=tk.BOTH, expand=True)
         self.createWidgets()
     
     def createWidgets(self):
@@ -31,26 +33,29 @@ class View(tk.Frame):
         self.createStatusbar()
 
     def createToolbar(self):
-        self.buttons["copy"] = tk.Button(self, text="Copy", command=lambda: self.registerAction("copy"))
-        self.buttons["copy"].grid(row=0, column=0)
-        self.buttons["cut"] = tk.Button(self, text="Cut", command=lambda: self.registerAction("cut"))
-        self.buttons["cut"].grid(row=0, column=1)
-        self.buttons["paste"] = tk.Button(self, text="Paste", command=self.execAction)
-        self.buttons["paste"].grid(row=0, column=2)
-        self.buttons["new_file"] = tk.Button(self, text="New file")
-        self.buttons["new_file"].grid(row=0, column=3)
-        self.buttons["delete"] = tk.Button(self, text="Delete", command=self.deleteFolder)
-        self.buttons["delete"].grid(row=0, column=4)
-        self.buttons["new_folder"] = tk.Button(self, text="New folder", command=self.newFolderDialog)
-        self.buttons["new_folder"].grid(row=0, column=5)
-        self.buttons["reload"] = tk.Button(self, text="Reload", command=self.reloadMainList)
-        self.buttons["reload"].grid(row=0, column=6)
+        buttons_frame = tk.Frame(self)
+        buttons_frame.pack(fill=tk.X)
+
+        self.buttons["copy"] = tk.Button(buttons_frame, text="Copy", command=lambda: self.registerAction("copy"))
+        self.buttons["copy"].pack(side=tk.LEFT)
+        self.buttons["cut"] = tk.Button(buttons_frame, text="Cut", command=lambda: self.registerAction("cut"))
+        self.buttons["cut"].pack(side=tk.LEFT)
+        self.buttons["paste"] = tk.Button(buttons_frame, text="Paste", command=self.execAction)
+        self.buttons["paste"].pack(side=tk.LEFT)
+        self.buttons["new_file"] = tk.Button(buttons_frame, text="New file")
+        self.buttons["new_file"].pack(side=tk.LEFT)
+        self.buttons["delete"] = tk.Button(buttons_frame, text="Delete", command=self.deleteFolder)
+        self.buttons["delete"].pack(side=tk.LEFT)
+        self.buttons["new_folder"] = tk.Button(buttons_frame, text="New folder", command=self.newFolderDialog)
+        self.buttons["new_folder"].pack(side=tk.LEFT)
+        self.buttons["reload"] = tk.Button(buttons_frame, text="Reload", command=self.reloadMainList)
+        self.buttons["reload"].pack(side=tk.LEFT)
  
     def createMainList(self):
         if self.main_list is None:
             self.main_list = tk.Listbox(self, selectmode=tk.MULTIPLE)
     
-        self.main_list.grid(row=1, column=0, columnspan=7, sticky="nsew")
+        self.main_list.pack(fill=tk.BOTH, expand=True)
         
         self.reloadMainList()       
         self.main_list.bind("<Double-Button-1>", self.reloadMainList) 
@@ -90,15 +95,17 @@ class View(tk.Frame):
             index += 1
 
     def createStatusbar(self):
-        shf_checkbutton = tk.Checkbutton(self.master, text="Show hidden files", variable=self.shf, command=self.reloadMainList)
- 
-        shf_checkbutton.grid(row=2, column=0, columnspan=7)
+        statusbar_frame = tk.Frame(self)
+        statusbar_frame.pack(fill=tk.X)
+
+        shf_checkbutton = tk.Checkbutton(statusbar_frame, text="Show hidden files", variable=self.shf, command=self.reloadMainList) 
+        shf_checkbutton.pack(side=tk.LEFT)
 
         self.statusbar_content = tk.StringVar()
-        statusbar = tk.Label(self, textvariable=self.statusbar_content)
+        statusbar = tk.Label(statusbar_frame, textvariable=self.statusbar_content)
         
         self.statusbar_content.set("")
-        statusbar.grid(row=3, column=0, columnspan=7)
+        statusbar.pack(side=tk.RIGHT)
 
     def newFolderDialog(self):
         self.fn_dialog = tk.Toplevel()
