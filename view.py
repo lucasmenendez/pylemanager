@@ -1,5 +1,5 @@
 from os import path 
-import controller
+import controller, webbrowser, tkMessageBox
 import Tkinter as tk
 
 class View(tk.Frame):
@@ -8,12 +8,14 @@ class View(tk.Frame):
 
     current_dir         = "~"
     items_selected      = []
+    action              = None
 
     main_list           = None
-    statusbar_content   = None
+    topMenu             = None
+    contextMenu         = None
+
     fn_dialog           = None
     shf                 = None
-    buttons             = {}
 
     def __init__(self, master = None):
         self.controller     = controller.Controller()
@@ -21,36 +23,48 @@ class View(tk.Frame):
 
         if master is None:
             master = tk.Tk()
-            master.geometry("300x200")
+            master.geometry("400x400")
 
         tk.Frame.__init__(self, master)
-        self.pack(fill=tk.BOTH, expand=True)
+        self.pack(fill=tk.BOTH, expand=True) 
+        self.master.bind("<Button-1>", self.closeContextMenu)
         self.createWidgets()
-    
-    def createWidgets(self):
-        self.createToolbar()
-        self.createMainList()        
-        self.createStatusbar()
-
-    def createToolbar(self):
-        buttons_frame = tk.Frame(self)
-        buttons_frame.pack(fill=tk.X)
-
-        self.buttons["copy"] = tk.Button(buttons_frame, text="Copy", command=lambda: self.registerAction("copy"))
-        self.buttons["copy"].pack(side=tk.LEFT)
-        self.buttons["cut"] = tk.Button(buttons_frame, text="Cut", command=lambda: self.registerAction("cut"))
-        self.buttons["cut"].pack(side=tk.LEFT)
-        self.buttons["paste"] = tk.Button(buttons_frame, text="Paste", command=self.execAction)
-        self.buttons["paste"].pack(side=tk.LEFT)
-        self.buttons["new_file"] = tk.Button(buttons_frame, text="New file")
-        self.buttons["new_file"].pack(side=tk.LEFT)
-        self.buttons["delete"] = tk.Button(buttons_frame, text="Delete", command=self.deleteFolder)
-        self.buttons["delete"].pack(side=tk.LEFT)
-        self.buttons["new_folder"] = tk.Button(buttons_frame, text="New folder", command=self.newFolderDialog)
-        self.buttons["new_folder"].pack(side=tk.LEFT)
-        self.buttons["reload"] = tk.Button(buttons_frame, text="Reload", command=self.reloadMainList)
-        self.buttons["reload"].pack(side=tk.LEFT)
+        
+        self.master.title(self.current_dir + " - Pylemanager")
+        self.master.mainloop()   
  
+    def createWidgets(self):
+        self.createTopMenu()
+        self.createMainList()        
+        self.createContextMenu()
+
+    def createTopMenu(self):
+        self.topMenu = tk.Menu(self)
+        
+        file_submenu = tk.Menu(self.topMenu, tearoff=0)
+        file_submenu.add_command(label="New folder", command=self.newFolderDialog)
+        file_submenu.add_separator()
+        file_submenu.add_command(label="Quit", command=self.quit)
+
+        edit_submenu = tk.Menu(self.topMenu, tearoff=0)
+        edit_submenu.add_command(label="Copy", command=lambda: self.registerAction("copy"))
+        edit_submenu.add_command(label="Cut", command=lambda: self.registerAction("cut")) 
+        edit_submenu.add_command(label="Paste", command=self.execAction)
+        edit_submenu.add_separator()
+        edit_submenu.add_command(label="Delete", command=self.deleteAction)
+ 
+        self.shf = tk.IntVar()
+        self.shf.set(0)
+        config_submenu = tk.Menu(self.topMenu, tearoff=0)
+        config_submenu.add_checkbutton(label="Show hidden files", variable=self.shf, command=self.reloadMainList)
+        config_submenu.add_separator()
+        config_submenu.add_command(label="About", command=lambda: webbrowser.open("https://github.com/lucasmenendez/pylemanager"))
+
+        self.topMenu.add_cascade(label="File", menu=file_submenu)
+        self.topMenu.add_cascade(label="Edit", menu=edit_submenu)
+        self.topMenu.add_cascade(label="Settings", menu=config_submenu)
+        self.master.config(menu=self.topMenu)
+
     def createMainList(self):
         if self.main_list is None:
             self.main_list = tk.Listbox(self, selectmode=tk.MULTIPLE)
@@ -79,7 +93,8 @@ class View(tk.Frame):
         if self.shf is None:
             self.shf = tk.IntVar()
             self.shf.set(0)
-        
+       
+        self.master.title(self.current_dir + " - Pylemanager")
         items = self.controller.loadFolder(self.current_dir, self.shf.get())
         items.sort()
 
@@ -94,36 +109,37 @@ class View(tk.Frame):
             self.main_list.insert(index, item)
             index += 1
 
-    def createStatusbar(self):
-        statusbar_frame = tk.Frame(self)
-        statusbar_frame.pack(fill=tk.X)
-
-        shf_checkbutton = tk.Checkbutton(statusbar_frame, text="Show hidden files", variable=self.shf, command=self.reloadMainList) 
-        shf_checkbutton.pack(side=tk.LEFT)
-
-        self.statusbar_content = tk.StringVar()
-        statusbar = tk.Label(statusbar_frame, textvariable=self.statusbar_content)
+    def createContextMenu(self):
+        self.contextMenu = tk.Menu(self, tearoff=0)
         
-        self.statusbar_content.set("")
-        statusbar.pack(side=tk.RIGHT)
+        self.contextMenu.add_command(label="Copy", command=lambda: self.registerAction("copy"))
+        self.contextMenu.add_command(label="Cut", command=lambda: self.registerAction("cut")) 
+        self.contextMenu.add_command(label="Paste", command=self.execAction)
+        self.contextMenu.add_command(label="Delete", command=self.deleteAction)
+        self.contextMenu.add_separator()
+        self.contextMenu.add_command(label="Reload", command=self.reloadMainList)
+
+        self.main_list.bind("<Button-3>", self.openContextMenu)
+
+    def openContextMenu(self, event):
+        self.contextMenu.post(event.x_root, event.y_root)
+
+    def closeContextMenu(self, event):
+        self.contextMenu.unpost()
 
     def newFolderDialog(self):
         self.fn_dialog = tk.Toplevel()
         self.fn_dialog.title("Create folder")
         
-        self.fn_dialog.grid()
-        self.fn_dialog.grid_rowconfigure(0, weight=1)
-        self.fn_dialog.grid_columnconfigure(0, weight=1)
-    
         fn = tk.StringVar()
         fd_field = tk.Entry(self.fn_dialog, textvariable=fn)
-        fd_field.grid(row=0, column=0, columnspan=2)
+        fd_field.pack(fill=tk.X)
 
         submit = tk.Button(self.fn_dialog, text="Create folder", command=lambda: self.submitNewFolder(fn.get()))
-        submit.grid(row=1, column=0)
+        submit.pack(side=tk.LEFT)
 
         cancel = tk.Button(self.fn_dialog, text="Close", command=self.fn_dialog.destroy)
-        cancel.grid(row=1, column=1)
+        cancel.pack(side=tk.RIGHT)
  
         self.fn_dialog.mainloop()
  
@@ -132,25 +148,33 @@ class View(tk.Frame):
         
         items_selected = []
         for index in selection:
-            item = self.current_dir + "/" + self.main_list.get(int(index))
-            items_selected.append(item)
+            basename = self.main_list.get(int(index))
+            if not basename.startswith("../"): 
+                item = self.current_dir + "/" + basename
+                items_selected.append(item)
         
         return items_selected
    
-    def registerAction(self, action):
+    def registerAction(self, action, display_info = True):
         self.items_selected = self.getSelection()
-        self.statusbar_content.set(str(len(self.items_selected)) + " selected.")
         self.action = action
         self.main_list.selection_clear(0, tk.END)
      
     def execAction(self):
-        action = getattr(self.controller, self.action)
-        
-        if action(self.items_selected, self.current_dir):
-            self.statusbar_content.set("Done! :)")
-            self.reloadMainList()
-        else:
-            self.statusbar_content.set("An error occurred :(")
+        if not self.action is None:
+            action = getattr(self.controller, self.action)     
+            location = self.current_dir
+            
+            selection = self.getSelection()
+            if len(selection) > 0:
+                location = selection[0]
+            if len(self.items_selected) > 0:
+                if tkMessageBox.askokcancel(self.action.capitalize(), "Are you sure? This action can be permanent"): 
+                    if action(self.items_selected, location):
+                        self.reloadMainList()
+                        self.action = None
+                    else:
+                        tkMessageBox.showerror("Ops", "An error occurred :(")            
 
     def submitNewFolder(self, folder_name):
         folder = self.current_dir + "/" + folder_name
@@ -161,14 +185,7 @@ class View(tk.Frame):
  
         self.fn_dialog.destroy()
 
-    def deleteFolder(self): 
-        if self.main_list.curselection(): 
-            index = self.main_list.curselection()[0]
-            basename = self.main_list.get(int(index))
-            path = self.current_dir + "/" + basename
-
-            if self.controller.delete(path):
-                self.statusbar_content.set("'"+basename+"' deleted succesfully.")
-                self.reloadMainList()
-            else:
-                self.statusbar_content.set("Error deleting '"+basename+"'.")
+    def deleteAction(self): 
+        if self.main_list.curselection():
+            self.registerAction("delete")
+            self.execAction() 
