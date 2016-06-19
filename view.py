@@ -91,9 +91,9 @@ class View(tk.Frame):
             if os.path.isdir(current_item):
                 self.current_dir = current_item
             else:
-                file_path = "open " + current_item.replace("'", "'\\'")
-                os.system(file_path)    
-         
+                file_path = current_item.replace(" ", "\ ")
+                os.system("open " + file_path)        
+ 
         index = 0
         if self.shf is None:
             self.shf = tk.IntVar()
