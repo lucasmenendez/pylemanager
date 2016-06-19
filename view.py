@@ -88,7 +88,7 @@ class View(tk.Frame):
             else:
                 current_item = self.current_dir + "/" + item
         
-            if path.isdir(current_item):
+            if os.path.isdir(current_item):
                 self.current_dir = current_item
             else:
                 print current_item
