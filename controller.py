@@ -1,3 +1,5 @@
+# -*- conding: utf-8 -*-
+
 import sys, os
 
 class Controller():

@@ -1,3 +1,5 @@
+# -*- conding: utf-8 -*-
+
 import os, controller, webbrowser, tkMessageBox
 import Tkinter as tk
 
