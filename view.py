@@ -91,8 +91,7 @@ class View(tk.Frame):
             if os.path.isdir(current_item):
                 self.current_dir = current_item
             else:
-                file_path = current_item.replace(" ", "\ ")
-                print file_path
+                print os.path.normpath(current_item)
                 #os.system("open " + file_path)        
  
         index = 0
