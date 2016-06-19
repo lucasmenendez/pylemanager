@@ -75,22 +75,16 @@ class Controller():
         for path in selection:
             if os.path.exists(path):
                 if os.path.isdir(path):
+                    new_selection = []
                     for src in os.listdir(path):
                         item = path + "/" + src
-                        if os.path.isdir(item):
-                            new_selection = []
-                            for basename in os.listdir(item):
-                                new_selection.append(item)
+                        new_selection.append(item)
 
-                            if not self.delete(new_selection, item):
-                                return False
-                        else:
-                            try:
-                                os.unlink(item)
-                            except:
-                                return False
                     try:
-                         os.rmdir(path)    
+                        if len(new_selection) > 0:
+                            if not self.delete(new_selection, path):
+                                return False
+                        os.rmdir(path)    
                     except:
                         return False
                 else:

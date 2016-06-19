@@ -171,10 +171,10 @@ class View(tk.Frame):
             if len(self.items_selected) > 0:
                 if tkMessageBox.askokcancel(self.action.capitalize(), "Are you sure? This action can be permanent"): 
                     if action(self.items_selected, location):
-                        self.reloadMainList()
                         self.action = None
                     else:
                         tkMessageBox.showerror("Ops", "An error occurred :(")            
+                    self.reloadMainList()
 
     def submitNewFolder(self, folder_name):
         folder = self.current_dir + "/" + folder_name
