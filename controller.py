@@ -117,7 +117,7 @@ class Controller():
         index = len(parts)-1
         return parts[index]
 
-    def escape(str):
+    def escape(self, str):
         result = str.replace("(", "\(")
         result = result.replace(")", "\)")
         result = result.replace("[", "\[")
