@@ -1,5 +1,4 @@
-from os import path, system 
-import controller, webbrowser, tkMessageBox
+import os, controller, webbrowser, tkMessageBox
 import Tkinter as tk
 
 class View(tk.Frame):
@@ -19,7 +18,7 @@ class View(tk.Frame):
 
     def __init__(self, master = None):
         self.controller     = controller.Controller()
-        self.current_dir    = path.expanduser(self.current_dir)
+        self.current_dir    = os.path.expanduser(self.current_dir)
 
         if master is None:
             master = tk.Tk()
@@ -93,7 +92,7 @@ class View(tk.Frame):
                 self.current_dir = current_item
             else:
                 print current_item
-                system("open " + current_item)    
+                os.system("open " + current_item)    
          
         index = 0
         if self.shf is None:
