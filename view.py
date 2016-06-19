@@ -92,7 +92,7 @@ class View(tk.Frame):
                 self.current_dir = current_item
             else:
                 print current_item
-                os.system("open " + current_item)    
+                os.system("open '" + current_item + "'")    
          
         index = 0
         if self.shf is None:
