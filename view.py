@@ -1,4 +1,4 @@
-from os import path 
+from os import path, system 
 import controller, webbrowser, tkMessageBox
 import Tkinter as tk
 
@@ -76,19 +76,25 @@ class View(tk.Frame):
 
     def reloadMainList(self, event = None):
         if not event is None and self.main_list.curselection(): 
-            folder_index = self.main_list.curselection()[0]
-            folder = self.main_list.get(int(folder_index))
-
-            if folder == "../":
-                folder = self.current_dir.split("/")
-                del folder[len(folder) - 1]
-                if len(folder) > 1:
-                    self.current_dir = "/".join(folder)
+            item_index = self.main_list.curselection()[0]
+            item = self.main_list.get(int(item_index))
+         
+            if item == "../":
+                item = self.current_dir.split("/")
+                del item[len(item) - 1]
+                if len(item) > 1:
+                    current_item = "/".join(item)
                 else:
-                    self.current_dir = "/"
+                    current_item = "/"
             else:
-                self.current_dir += "/" + folder
-            
+                current_item = self.current_dir + "/" + item
+        
+            if path.isdir(current_item):
+                self.current_dir = current_item
+            else:
+                print current_item
+                system("open " + current_item)    
+         
         index = 0
         if self.shf is None:
             self.shf = tk.IntVar()
