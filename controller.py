@@ -116,3 +116,11 @@ class Controller():
         parts = item.split("/")
         index = len(parts)-1
         return parts[index]
+
+    def escape(str):
+        result = str.replace("(", "\(")
+        result = result.replace(")", "\)")
+        result = result.replace("[", "\[")
+        result = result.replace("]", "\]")
+        result = result.replace(" ", "\ ")
+        return result

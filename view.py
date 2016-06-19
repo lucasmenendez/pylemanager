@@ -91,8 +91,7 @@ class View(tk.Frame):
             if os.path.isdir(current_item):
                 self.current_dir = current_item
             else:
-                print os.path.normpath(current_item)
-                #os.system("open " + file_path)        
+                os.system("open " + self.controller.escape(file_path))        
  
         index = 0
         if self.shf is None:
