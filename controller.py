@@ -120,9 +120,9 @@ class Controller():
         return parts[index]
 
     def escape(self, str):
-        result = str.replace("(", "\(")
-        result = result.replace(")", "\)")
-        result = result.replace("[", "\[")
-        result = result.replace("]", "\]")
-        result = result.replace(" ", "\ ")
+        result = str.replace("(", "\\(")
+        result = result.replace(")", "\\)")
+        result = result.replace("[", "\\[")
+        result = result.replace("]", "\\]")
+        result = result.replace(" ", "\\ ")
         return result
