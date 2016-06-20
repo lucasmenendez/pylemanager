@@ -93,7 +93,8 @@ class View(tk.Frame):
             if os.path.isdir(current_item):
                 self.current_dir = current_item
             else:
-                os.system("open " + self.controller.escape(current_item))        
+                cmd = "xdg-open '%s'" % current_item
+                os.system(cmd.encode("utf8"))        
  
         index = 0
         if self.shf is None:
