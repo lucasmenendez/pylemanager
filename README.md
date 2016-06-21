@@ -1,5 +1,5 @@
 # pylemanager
-Simple python graphical filemanager
+Simple python GUI filemanager
 
 ## Demo
 ![](/demo.gif?raw=true)
