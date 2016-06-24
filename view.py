@@ -93,11 +93,15 @@ class View(tk.Frame):
             if os.path.isdir(current_item):
                 self.current_dir = current_item
             else:
-                cmd = "open '%s'" % current_item
+                cmd = 'open "%s"' % current_item
                 print sys.platform
-                if sys.platform is "linux2":
-                    cmd = "xdg-%s" % cmd
-                os.system(cmd.encode("utf8"))
+                print cmd
+                if sys.platform.startswith("linux2"):
+                    cmd = 'xdg-%s' % cmd
+                elif sys.platform.startswith("win32"):
+                    print "caca"
+                    cmd = 'start "%s"' % current_item
+                os.system(cmd)
  
         index = 0
         if self.shf is None:
