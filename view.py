@@ -1,6 +1,6 @@
 # -*- conding: utf-8 -*-
 
-import os, controller, webbrowser, tkMessageBox
+import sys, os, controller, webbrowser, tkMessageBox
 import Tkinter as tk
 
 class View(tk.Frame):
@@ -93,8 +93,11 @@ class View(tk.Frame):
             if os.path.isdir(current_item):
                 self.current_dir = current_item
             else:
-                cmd = "xdg-open '%s'" % current_item
-                os.system(cmd.encode("utf8"))        
+                cmd = "open '%s'" % current_item
+                print sys.platform
+                if sys.platform is "linux2":
+                    cmd = "xdg-%s" % cmd
+                os.system(cmd.encode("utf8"))
  
         index = 0
         if self.shf is None:
